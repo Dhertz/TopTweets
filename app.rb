@@ -54,12 +54,15 @@ get "/edition/" do
       :token_secret => @access_token.secret
     })
   end
-  redirect "/configure/" unless @access_token
   @n = params[:n].to_i
   if (@n != 5 && @n != 10)
     @n = 3
   end
-  statuses = @client.statuses.home_timeline? :include_entities => true, :count => 800
+  begin
+    statuses = @client.statuses.home_timeline? :include_entities => true, :count => 800
+  rescue
+    halt 400
+  end
   maxsize = statuses.length
   if (@n > maxsize)
     @n = maxsize
@@ -98,6 +101,7 @@ end
 
 get "/configure/" do
   session[:ret_url] = params[:return_url]
+  session[:fail_url] = params[:failure_url]
   @request_token = @consumer.get_request_token(:oauth_callback => "http://#{@host}/auth")
   session[:oauth][:request_token] = @request_token.token
   session[:oauth][:request_token_secret] = @request_token.secret
@@ -109,6 +113,9 @@ get "/sample/" do
 end
 
 get "/auth" do
+  if(params[:denied])
+    redirect session[:fail_url]
+  end
   @access_token = @request_token.get_access_token :oauth_verifier => params[:oauth_verifier]
   session[:oauth][:access_token] = @access_token.token
   session[:oauth][:access_token_secret] = @access_token.secret
@@ -121,4 +128,8 @@ end
 get "/logout" do
   session[:oauth] = {}
   redirect "/edition/"
+end
+
+error 400 do
+  '<center><h1>Error 400!</h1> <br />Bad request, no credenitals provided.</center>'
 end
