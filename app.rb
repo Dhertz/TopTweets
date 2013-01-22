@@ -87,13 +87,13 @@ get "/edition/" do
 end
 
 post "/validate_config/" do
-  conf = JSON.parse(params[:config])
+  conf = JSON.parse(params[:config]) or status 400
   content_type :json
-  n = conf["n"] or status 400
+  n = conf["n"]
   if(n == '3' || n == '5' || n == '10')
     status 200
     { :valid => true}.to_json
-  else
+  els
     status 400 
     { :valid => false, :errors => "Incorrect tweetage amount."}.to_json
   end
