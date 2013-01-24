@@ -135,5 +135,5 @@ get "/logout" do
 end
 
 error 400 do
-  '<center><h1>Error 400!</h1> <br />Bad request, no credenitals provided.</center>'
+  haml :fourhundred
 end
