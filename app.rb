@@ -61,7 +61,8 @@ get "/edition/" do
   begin
     statuses = @client.statuses.home_timeline? :include_entities => true, :count => 800
   rescue
-    halt 400
+    status 203
+    halt haml(:fourhundred)
   end
   maxsize = statuses.length
   if (@n > maxsize)
