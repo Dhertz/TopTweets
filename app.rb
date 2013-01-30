@@ -55,7 +55,7 @@ get "/edition/" do
     })
   end
   @n = params[:n].to_i
-  if (@n != 5 && @n != 10)
+  if (@n != 5)
     @n = 3
   end
   begin
