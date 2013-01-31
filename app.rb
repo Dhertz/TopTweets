@@ -61,6 +61,7 @@ get "/edition/" do
   begin
     statuses = @client.statuses.home_timeline? :include_entities => true, :count => 800
   rescue
+    etag Digest::MD5.hexdigest("FAILURE!")
     status 203
     halt haml(:fourhundred)
   end
