@@ -44,7 +44,7 @@ get "/" do
 end
 
 get "/edition/" do
-  unless @access_token
+  begin
     @access_token = OAuth::AccessToken.new(@consumer, params[:access_token], params[:access_token_secret])
     @client = Grackle::Client.new(:auth => {
       :type => :oauth,
@@ -53,39 +53,37 @@ get "/edition/" do
       :token => @access_token.token, 
       :token_secret => @access_token.secret
     })
-  end
-  @n = params[:n].to_i
-  if (@n != 5)
-    @n = 3
-  end
-  begin
+    @n = params[:n].to_i
+    if (@n != 5)
+      @n = 3
+    end
     statuses = @client.statuses.home_timeline? :include_entities => true, :count => 800
+    maxsize = statuses.length
+    if (@n > maxsize)
+      @n = maxsize
+    end
+    @topstatus = Array.new
+    topTweet = Struct.new(:tweet, :rank)
+    @topstatus[0] = topTweet.new(statuses[-1], -1.0)
+    for status in statuses
+      i = 0
+      for tweet in @topstatus
+        count = (status.retweet_count.to_f**2) / (10*status.user.followers_count.to_f**0.8)
+        if(tweet.rank <= count)
+          @topstatus.insert(i, topTweet.new(status, count))
+          break
+        end
+        i += 1 
+      end
+    end
+    @last = statuses[-1].created_at
+    etag Digest::MD5.hexdigest("#{statuses[0].text}")
+    haml :index
   rescue
     etag Digest::MD5.hexdigest("FAILURE!")
     status 203
     halt haml(:fourhundred)
   end
-  maxsize = statuses.length
-  if (@n > maxsize)
-    @n = maxsize
-  end
-  @topstatus = Array.new
-  topTweet = Struct.new(:tweet, :rank)
-  @topstatus[0] = topTweet.new(statuses[-1], -1.0)
-  for status in statuses
-    i = 0
-    for tweet in @topstatus
-      count = (status.retweet_count.to_f**2) / (10*status.user.followers_count.to_f**0.8)
-      if(tweet.rank <= count)
-        @topstatus.insert(i, topTweet.new(status, count))
-        break
-      end
-      i += 1 
-    end
-  end
-  @last = statuses[-1].created_at
-  etag Digest::MD5.hexdigest("#{statuses[0].text}")
-  haml :index
 end
 
 post "/validate_config/" do
