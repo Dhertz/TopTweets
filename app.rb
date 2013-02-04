@@ -98,7 +98,7 @@ post "/validate_config/" do
     status 200
     { :valid => true}.to_json
   else 
-    status 401
+    status 418
     { :valid => false, :errors => "Incorrect tweetage amount."}.to_json
   end
 end
