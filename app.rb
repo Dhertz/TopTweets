@@ -93,13 +93,11 @@ post "/validate_config/" do
     halt 400
   end
   content_type :json
-  n = conf["n"]
+  n = conf['n']
   if(n == '3' || n == '5')
     { :valid => true}.to_json
-    halt 200
   else 
     { :valid => false, :errors => "Incorrect tweetage amount."}.to_json
-    halt 400
   end
 end
 
