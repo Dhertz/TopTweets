@@ -15,8 +15,7 @@
         "label": "Choose the number of tweets you wish to receive",
         "options": [
           ["3 Tweets","3"],
-          ["5 Tweets","5"],
-          ["10 Tweets","10"]
+          ["5 Tweets","5"]
         ]
       }
     ]
