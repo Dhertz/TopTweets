@@ -6,6 +6,7 @@ require 'grackle'
 require 'haml'
 require 'json'
 require 'uri'
+require 'time'
 
 enable :sessions
 
@@ -63,14 +64,15 @@ get "/edition/" do
       @n = maxsize
     end
     @topstatus = Array.new
-    topTweet = Struct.new(:tweet, :rank)
+    topTweet = Struct.new(:tweet, :rank, :time)
     @topstatus[0] = topTweet.new(statuses[-1], -1.0)
     for status in statuses
       i = 0
       for tweet in @topstatus
-        count = (status.retweet_count.to_f**2) / (10*status.user.followers_count.to_f**0.8)
+        timediff= Time.now - Time.parse(status.created_at)
+        count = (status.retweet_count.to_f**2) / ((status.user.followers_count.to_f**0.8) + timediff**1.1)
         if(tweet.rank <= count)
-          @topstatus.insert(i, topTweet.new(status, count))
+          @topstatus.insert(i, topTweet.new(status, count, status.created_at))
           break
         end
         i += 1 
@@ -117,15 +119,19 @@ get "/sample/" do
 end
 
 get "/auth" do
-  if(params[:denied])
-    redirect session[:fail_url]
-  end
-  @access_token = @request_token.get_access_token :oauth_verifier => params[:oauth_verifier]
-  session[:oauth][:access_token] = @access_token.token
-  session[:oauth][:access_token_secret] = @access_token.secret
-  uri = URI(session[:ret_url])
-  if(uri.host == "remote.bergcloud.com")
-    redirect "#{session[:ret_url]}?config[access_token]=#{@access_token.token}&config[access_token_secret]=#{@access_token.secret}"
+  begin
+    if(params[:denied])
+      redirect session[:fail_url]
+    end
+    @access_token = @request_token.get_access_token :oauth_verifier => params[:oauth_verifier]
+    session[:oauth][:access_token] = @access_token.token
+    session[:oauth][:access_token_secret] = @access_token.secret
+    uri = URI(session[:ret_url])
+    if(uri.host == "remote.bergcloud.com")
+      redirect "#{session[:ret_url]}?config[access_token]=#{@access_token.token}&config[access_token_secret]=#{@access_token.secret}"
+    end
+  rescue
+    halt 400
   end
 end
 

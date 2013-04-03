@@ -3,7 +3,7 @@
 %html{:xmlns => "http://www.w3.org/1999/xhtml"}
   %head
     %title
-      Top Tweets!  
+      Top Tweets!
     %link{:href => "http://#{@host}/css/styles.css", :rel => "stylesheet"}
   %body
     %img{:src => "http://#{@host}/images/header.png", :alt => "header"}
@@ -13,7 +13,7 @@
           %td.user
             = top.tweet.user.name
           %td.tweet
-            %div 
+            %div
               = top.tweet.text
       %tr
         %td{:colspan => 2} 
