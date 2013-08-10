@@ -12,13 +12,13 @@ enable :sessions
 before do
   session[:oauth] ||= {}  
 
-  @consumer_key = ENV['KEY'] #"h8A12ACDWihW9LQZUaTYQ"
-  @consumer_secret = ENV['secret'] #"TePhToUj0LNIJ2aBfU2MAz4IZG8LLZvWAqpaj7h4Mhc"
+  @consumer_key = ENV['KEY']
+  @consumer_secret = ENV['secret']
 
   @host = request.host
   @host << ":4567" if request.host == "localhost"
   
-  @consumer ||= OAuth::Consumer.new(@consumer_key, @consumer_secret, :site => "http://api.twitter.com/1/")
+  @consumer ||= OAuth::Consumer.new(@consumer_key, @consumer_secret, :site => "http://api.twitter.com/")
   
   if !session[:oauth][:request_token].nil? && !session[:oauth][:request_token_secret].nil?
     @request_token = OAuth::RequestToken.new(@consumer, session[:oauth][:request_token], session[:oauth][:request_token_secret])
@@ -44,7 +44,7 @@ get "/" do
 end
 
 get "/edition/" do
-  begin
+  # begin
     @access_token = OAuth::AccessToken.new(@consumer, params[:access_token], params[:access_token_secret])
     @client = Grackle::Client.new(:auth => {
       :type => :oauth,
@@ -80,11 +80,11 @@ get "/edition/" do
     @last = statuses[-1].created_at
     etag Digest::MD5.hexdigest("#{statuses[0].text}")
     haml :index
-  rescue
-    etag Digest::MD5.hexdigest("FAILURE!")
-    status 203
-    halt haml :fourhundred
-  end
+  # rescue
+  #   etag Digest::MD5.hexdigest("FAILURE!")
+  #   status 203
+  #   halt haml :fourhundred
+  # end
 end
 
 post "/validate_config/" do
