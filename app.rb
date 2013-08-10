@@ -6,15 +6,14 @@ require 'grackle'
 require 'haml'
 require 'json'
 require 'uri'
-require 'time'
 
 enable :sessions
 
 before do
   session[:oauth] ||= {}  
 
-  @consumer_key = "h8A12ACDWihW9LQZUaTYQ"
-  @consumer_secret = "TePhToUj0LNIJ2aBfU2MAz4IZG8LLZvWAqpaj7h4Mhc"
+  @consumer_key = ENV['KEY'] #"h8A12ACDWihW9LQZUaTYQ"
+  @consumer_secret = ENV['secret'] #"TePhToUj0LNIJ2aBfU2MAz4IZG8LLZvWAqpaj7h4Mhc"
 
   @host = request.host
   @host << ":4567" if request.host == "localhost"
@@ -84,7 +83,7 @@ get "/edition/" do
   rescue
     etag Digest::MD5.hexdigest("FAILURE!")
     status 203
-    halt haml(:fourhundred)
+    halt haml :fourhundred
   end
 end
 
