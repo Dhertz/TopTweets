@@ -5,4 +5,3 @@ gem "oauth"
 gem 'grackle'
 gem 'haml'
 gem 'json'
-gem 'time'
