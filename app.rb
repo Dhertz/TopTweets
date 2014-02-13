@@ -18,7 +18,7 @@ before do
   @host = request.host
   @host << ":4567" if request.host == "localhost"
   
-  @consumer ||= OAuth::Consumer.new(@consumer_key, @consumer_secret, :site => "http://api.twitter.com/")
+  @consumer ||= OAuth::Consumer.new(@consumer_key, @consumer_secret, :site => "https://api.twitter.com/")
   
   if !session[:oauth][:request_token].nil? && !session[:oauth][:request_token_secret].nil?
     @request_token = OAuth::RequestToken.new(@consumer, session[:oauth][:request_token], session[:oauth][:request_token_secret])
@@ -46,7 +46,7 @@ end
 get "/edition/" do
   # begin
     @access_token = OAuth::AccessToken.new(@consumer, params[:access_token], params[:access_token_secret])
-    @client = Grackle::Client.new(:auth => {
+    @client = Grackle::Client.new(:ssl=>true, :auth => {
       :type => :oauth,
       :consumer_key => @consumer_key,
       :consumer_secret => @consumer_secret,
