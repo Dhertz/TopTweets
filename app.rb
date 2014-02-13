@@ -126,7 +126,7 @@ get "/auth" do
     session[:oauth][:access_token] = @access_token.token
     session[:oauth][:access_token_secret] = @access_token.secret
     uri = URI(session[:ret_url])
-    if(uri.host == "remote.bergcloud.com")
+    if(uri.host == "bergcloud.com")
       redirect "#{session[:ret_url]}?config[access_token]=#{@access_token.token}&config[access_token_secret]=#{@access_token.secret}"
     end
   rescue
